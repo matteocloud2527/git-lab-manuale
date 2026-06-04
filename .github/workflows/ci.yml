@@ -1,0 +1,24 @@
+﻿name: ci
+on:
+  pull_request:
+    branches: [main]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: README must exist
+        run: test -f README.md
+
+      - name: No debug or temp files committed
+        run: |
+          if find . -type f \( -name "*.debug" -o -name "*.tmp" -o -name "*.bak" \) \
+               -not -path "./.git/*" | grep -q .; then
+            echo "Trovati file di debug/temp committati"
+            exit 1
+          fi
+          echo "Filesystem pulito"
+      - name: README must contain Greetings line
+        run: grep -q "^Greetings:" README.md
